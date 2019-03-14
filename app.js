@@ -2,21 +2,31 @@ var natural = require('natural')
 var tokenizer = new natural.WordTokenizer();
 
 module.exports = function(source,search,options = { method : "avg" }){
+	source = source || ""
+	search = search || ""
 	var tokenizedSource = tokenizer.tokenize(source)
 	var tokenizedSearch = tokenizer.tokenize(search)
 
 	var match = []
-	for(var i=0;i<tokenizedSearch.length;i++){
-		var maxDistance = 0
-		var maxIndex = 0
-		for(var j=maxIndex;j<tokenizedSource.length;j++){
-			let distance = natural.JaroWinklerDistance(tokenizedSearch[i],tokenizedSource[j])
-			if( distance > maxDistance){
-				maxDistance = distance
-				maxIndex = j
+	if(tokenizedSource.length == 0 && tokenizedSearch.length == 0){
+		match = [1]
+	}
+	if(tokenizedSource.length > 0 && tokenizedSearch.length == 0){
+		match = [1]
+	}
+	else{
+		for(var i=0;i<tokenizedSearch.length;i++){
+			var maxDistance = 0
+			var maxIndex = 0
+			for(var j=maxIndex;j<tokenizedSource.length;j++){
+				let distance = natural.JaroWinklerDistance(tokenizedSearch[i],tokenizedSource[j])
+				if( distance > maxDistance){
+					maxDistance = distance
+					maxIndex = j
+				}
 			}
+			match.push(maxDistance)	
 		}
-		match.push(maxDistance)	
 	}
 
 	if(options.method == "avg"){
